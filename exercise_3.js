@@ -4,6 +4,7 @@
 
 var mysql = require('mysql');
 var colors = require('colors');
+var util = require('util');
 
 var connection = mysql.createConnection({
   host     : process.env.IP,
@@ -12,14 +13,33 @@ var connection = mysql.createConnection({
   database : 'addressbook'
 });
 
-var accounts = connection.query("select * from Account join AddressBook on Account.id=AddressBook.accountId group by Account.id", function(err, results) {
+var accounts = connection.query("select Account.id as Account_id, Account.email, AddressBook.id as AddressBook_id, AddressBook.name from Account join AddressBook on Account.id=AddressBook.accountId", function(err, results) {
     if (err){
         return "Error";
     }
     else{
-        results.forEach(function(item){
-            console.log((("#" + item.id + ":" + item.email).bold) + '\n' + item.name + '\n');
-        })
+        
+        var ACCOUNTS = {};
+        var BOOKS = {};
+        
+        var newLook = results.reduce(function (acc, current) {
+            
+            var account = ACCOUNTS[current.Account_id] || (ACCOUNTS[current.Account_id] = {id: current.Account_id, email: current.email, addressbooks: []})
+            var book = BOOKS[current.AddressBook_id] || (BOOKS[current.AddressBook_id]= {name: current.name});
+            
+            if (account.addressbooks.indexOf(book)===-1){
+                account.addressbooks.push(book)
+            }
+            if (acc.indexOf(account)===-1){
+                acc.push(account)
+            }
+            return acc;
+        }, [])
+        
+        console.log(util.inspect(newLook, { depth: 10, colors: true }));
+        
         }
     });
+    
+    
 connection.end();
