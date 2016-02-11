@@ -18,7 +18,7 @@ var emails = connection.query("select id, email from Account limit 5", function(
     }
     else{
         results.forEach(function(item){
-            console.log(("#" + item.id + ":" + item.email).bold);
+            console.log(("#" + item.id + ":" + item.email).bold)
         })
     }
 });
