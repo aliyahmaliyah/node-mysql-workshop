@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
   database : 'addressbook'
 });
 
-var accounts = connection.query("select * from Account join AddressBook on Account.id=AddressBook.accountId", function(err, results) {
+var accounts = connection.query("select * from Account join AddressBook on Account.id=AddressBook.accountId group by Account.id", function(err, results) {
     if (err){
         return "Error";
     }
